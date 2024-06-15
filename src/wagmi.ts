@@ -1,11 +1,10 @@
 import { http, createConfig } from 'wagmi'
 import { base, baseSepolia, foundry } from 'wagmi/chains'
-import { coinbaseWallet, injected } from 'wagmi/connectors'
+import { coinbaseWallet, metaMask } from 'wagmi/connectors'
 
 export const config = createConfig({
   chains: [base, baseSepolia],
   connectors: [
-    injected(),
     coinbaseWallet({ appName: 'Create Wagmi' }),
   ],
   ssr: true,

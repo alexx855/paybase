@@ -2,7 +2,26 @@
 // Counter
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x6c6077c383b80fB8EaAEcbB0421B6a90958f0CCf)
+ * -
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x27b423a51aa900e36452bF29be9248D9E578af3F)
+ */
 export const counterAbi = [
+  {
+    type: 'function',
+    inputs: [],
+    name: 'decrement',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getnumber',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
   {
     type: 'function',
     inputs: [],
@@ -19,12 +38,53 @@ export const counterAbi = [
   },
   {
     type: 'function',
+    inputs: [],
+    name: 'reset',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     inputs: [{ name: 'newNumber', internalType: 'uint256', type: 'uint256' }],
     name: 'setNumber',
     outputs: [],
     stateMutability: 'nonpayable',
   },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'newNumber',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'NumberChanged',
+  },
 ] as const
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x6c6077c383b80fB8EaAEcbB0421B6a90958f0CCf)
+ * -
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x27b423a51aa900e36452bF29be9248D9E578af3F)
+ */
+export const counterAddress = {
+  8453: '0x6c6077c383b80fB8EaAEcbB0421B6a90958f0CCf',
+  31337: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+  84532: '0x27b423a51aa900e36452bF29be9248D9E578af3F',
+} as const
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x6c6077c383b80fB8EaAEcbB0421B6a90958f0CCf)
+ * -
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x27b423a51aa900e36452bF29be9248D9E578af3F)
+ */
+export const counterConfig = {
+  address: counterAddress,
+  abi: counterAbi,
+} as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IERC165
