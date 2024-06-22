@@ -50,8 +50,8 @@ export async function POST(req: NextRequest) {
 }
 
 const handleChargeSucceeded = async (charge: Stripe.Charge) => {
-  const { BACKEND_WALLET_ADDRESS } = process.env;
-  if (!BACKEND_WALLET_ADDRESS) {
+  const { BACKEND_WALLET_PK } = process.env;
+  if (!BACKEND_WALLET_PK) {
     throw 'Server misconfigured. Did you forget to add a ".env.local" file?';
   }
 

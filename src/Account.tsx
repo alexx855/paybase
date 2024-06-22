@@ -1,25 +1,24 @@
 'use client'
 
-import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi'
+import { useAccount, useBalance, useConnect, useDisconnect, useSwitchChain } from 'wagmi'
+import { formatEther } from 'viem'
+import Link from 'next/link'
 
 function Account() {
   const account = useAccount()
   const { connectors, connect, status, error } = useConnect()
   const { disconnect } = useDisconnect()
   const { chains, switchChain, isPending } = useSwitchChain();
+  const { data, } = useBalance({
+    address: account.address,
+  })
+
   return (
     <>
-
-        <h2>Account</h2>
-
+      {account.status === 'connected' ? (
         <div>
-        status: {account.status}
-
-        {account.status === 'connected' && (
-          <div>
-            <span>addresses: {JSON.stringify(account.addresses)}</span>
-            <br />
-            <span> chainId: {account.chainId}</span>
+          <h1>Refill <Link href={`/refill/${account.address}`}>{account.address}</Link></h1>
+          {data && <h2>Your balance is: {formatEther(data.value)}</h2>}
             {chains.map((chain) => {
               if (chain.id === account.chainId) {
                 return (
@@ -44,23 +43,20 @@ function Account() {
             Disconnect
           </button>
           </div>
-        )}
-      </div>
-
-      <div>
-        <h2>Connect</h2>
-        {connectors.map((connector) => (
-          <button
-            key={connector.uid}
-            onClick={() => connect({ connector })}
-            type="button"
-          >
-            {connector.name}
-          </button>
-        ))}
-        <div>{status}</div>
-        <div>{error?.message}</div>
-      </div>
+      ) : (
+        <div>
+            <h1>Please connect your wallet:</h1>
+            {connectors.map((connector) => (
+              <button
+                key={connector.uid}
+                onClick={() => connect({ connector })}
+                type="button"
+              >
+                {connector.name}
+              </button>
+            ))}
+          </div>
+      )}
     </>
   )
 }
