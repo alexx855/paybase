@@ -5,10 +5,10 @@ const { STRIPE_SECRET_KEY, NEXT_PUBLIC_BASE_URL } = process.env;
 
 export async function POST(req: Request) {
   console.log(`new request: ${req.url}`);
-  // const { transaction_details } = await req.json();
-  // if (!transaction_details) {
-  //   throw 'Request is missing "transaction_details".';
-  // }
+  const { wallet_addresses } = await req.json();
+  if (!wallet_addresses) {
+    throw 'Request is missing "wallet_addresses".';
+  }
 
   // Create a Stripe payment intent for $100 USD.
   if (!STRIPE_SECRET_KEY) {
@@ -24,24 +24,16 @@ export async function POST(req: Request) {
     apiVersion: "2024-04-10",
   });
 
-  const transaction_details = {
-    destination_currency: "avax",
-    destination_exchange_amount: "3",
-    destination_network: "avalanche",
-  };
-  // -d "wallet_addresses[ethereum]"="0xB00F0759DbeeF5E543Cc3E3B07A6442F5f3928a2" \
-  // -d "source_currency"="usd" \
-  // -d "destination_currency"="eth" \
-  // -d "destination_network"="ethereum" \
-  // -d "destination_currencies[]"="eth" \
-  // -d "destination_networks[]"="ethereum"
+
 
   // Create an OnrampSession with the order amount and currency
   const onrampSession = await new OnrampSessionResource(stripe).create({
     transaction_details: {
-      destination_currency: transaction_details["destination_currency"],
-      destination_exchange_amount: transaction_details["destination_exchange_amount"],
-      destination_network: transaction_details["destination_network"],
+      destination_currency: "eth",
+      destination_network: "base",
+      wallet_addresses: {
+        base_network: wallet_addresses,
+      },
     },
   });
 

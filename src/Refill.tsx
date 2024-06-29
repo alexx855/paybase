@@ -5,54 +5,62 @@ import React, { useEffect, useState } from "react";
 function Refill({ address }: { address: `0x${string}` }) {
   const [clientSecret, setClientSecret] = useState("");
 
-  const onClick = async () => {
-    const resp = await fetch("/api/create-onramp-session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        wallet_addresses: address,
-        destination_exchange_amount: "1.37",
-        destination_network: "baseSepolia",
-      }),
-    });
-    if (resp.ok) {
-      const json = await resp.json();
-      setClientSecret(json.clientSecret);
-    }
-  };
+  useEffect(() => {
+    const fetchClientSecret = async () => {
+      if (!address) return;
+
+      const resp = await fetch("/api/create-onramp-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          wallet_addresses: address,
+          destination_network: "base",
+        }),
+      });
+      if (resp.ok) {
+        const json = await resp.json();
+        setClientSecret(json.clientSecret);
+      }
+    };
+
+    fetchClientSecret();
+  }, [address]);
 
   useEffect(() => {
     if (!clientSecret) {
       return;
     }
 
-    // Dynamically load the StripeJS script
     const loadStripeJS = () => {
       return new Promise<void>((resolve, reject) => {
-        const stripeJSScript = document.createElement('script');
-        stripeJSScript.src = 'https://js.stripe.com/v3/';
-        stripeJSScript.onload = () => resolve();
-        stripeJSScript.onerror = () => reject('StripeJS failed to load');
-        document.body.appendChild(stripeJSScript);
+        if (!document.querySelector('script[src="https://js.stripe.com/v3/"]')) {
+          const stripeJSScript = document.createElement('script');
+          stripeJSScript.src = 'https://js.stripe.com/v3/';
+          stripeJSScript.onload = () => resolve();
+          stripeJSScript.onerror = () => reject('StripeJS failed to load');
+          document.body.appendChild(stripeJSScript);
+        } else {
+          reject("StripeJS already loaded");
+        }
       });
     };
 
-    // Dynamically load the Stripe onramp script
     const loadOnrampScript = () => {
       return new Promise<void>((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = 'https://crypto-js.stripe.com/crypto-onramp-outer.js';
-        script.onload = () => resolve();
-        script.onerror = () => reject('Stripe Crypto Onramp failed to load');
-        document.body.appendChild(script);
+        if (!document.querySelector('script[src="https://crypto-js.stripe.com/crypto-onramp-outer.js"]')) {
+          const script = document.createElement('script');
+          script.src = 'https://crypto-js.stripe.com/crypto-onramp-outer.js';
+          script.onload = () => resolve();
+          script.onerror = () => reject('Stripe Crypto Onramp failed to load');
+          document.body.appendChild(script);
+        } else {
+          reject("Onramp script already loaded");
+        }
       });
     };
 
-
-    // Load StripeJS, then load the Crypto Onramp script
     loadStripeJS().then(() => {
       loadOnrampScript().then(() => {
-        // Ensure the StripeOnramp is available in the window object
         if ((window as any).StripeOnramp) {
           const stripeOnramp = (window as any).StripeOnramp(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
           const onrampSession = stripeOnramp.createSession({ clientSecret });
@@ -61,12 +69,6 @@ function Refill({ address }: { address: `0x${string}` }) {
       }).catch(error => console.error(error));
     }).catch(error => console.error(error));
 
-    // Cleanup function to remove the scripts
-    return () => {
-      document.querySelectorAll('script[src^="https://js.stripe.com"], script[src^="https://crypto-js.stripe.com"]').forEach(script => {
-        document.body.removeChild(script);
-      });
-    };
   }, [clientSecret]);
 
   if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
@@ -76,12 +78,7 @@ function Refill({ address }: { address: `0x${string}` }) {
   return (
     <div>
       {!clientSecret ? (
-        <button
-          onClick={onClick}
-          disabled={!address}
-        >
-          Refill balance with Stripe
-        </button>
+        <div>Loading...</div> // Placeholder content while waiting for clientSecret
       ) : (
         <>
           <div id="onramp-message"></div>
@@ -92,5 +89,4 @@ function Refill({ address }: { address: `0x${string}` }) {
   );
 }
 
-
-export default Refill
+export default Refill;
