@@ -7,6 +7,7 @@ function Page({ params }: { params: { address: string } }) {
 
   return (
     <main>
+      <h1>Refill <span className="text-gray-500">{params.address}</span></h1>
       <Refill address={params.address} />
     </main>
   )
